@@ -1,6 +1,7 @@
 {-
 ---
 fulltitle: "In class exercise: Semigroup, Monoid and Foldable"
+date:
 ---
 -}
 

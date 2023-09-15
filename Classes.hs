@@ -1,7 +1,7 @@
 {-
 ---
 fulltitle: Type Classes
-date: September 26, 2022
+date: September 25, 2023
 ---
 -}
 
@@ -90,6 +90,14 @@ Again, this makes sense: We've used equality at many different types,
 but it doesn't work at *every* type: there is no obvious way to check
 for equality on functions, for example.
 
+Furthermore, this type also says that we can only test arguments with
+the *same* type for equality. We will get a compile-time type error
+if we try to compare a `Bool` and an `[Char]`, for example.
+-}
+
+-- >>> True == "True"
+
+{-
 Let's peek at the definition of the `Eq` *type class*:
 
     class Eq a where
@@ -118,17 +126,28 @@ instance Eq PrimaryColor where
   Green == Green = True
   _ == _ = False
 
+  (/=) :: PrimaryColor -> PrimaryColor -> Bool
   Red /= Red = False
   Blue /= Blue = False
   Green /= Green = False
   _ /= _ = True
 
 {-
-Now we can use `(==)` and `(/=)` on `PrimaryColor`s!
+This code means that we are making the overloaded `(==)` and `(/=)` operators
+available for the `PrimaryColor` type.
+
+If we ask for information about this type, we can see that it is now a member
+of the `Eq` type class.
 -}
 
-fancyTrue :: Bool
-fancyTrue = Red == Red
+-- >>> :info PrimaryColor
+
+{-
+With this instance declaration we can use `(==)` and `(/=)` on `PrimaryColor`s! Try
+it out!
+-}
+
+-- >>> Red == Red
 
 {-
 It might seem annoying, though, that we had to provide both `(==)` and
@@ -184,11 +203,10 @@ either inline
 -}
 
 -- >>> tree1 == tree1
--- True
+
 -- >>> tree1 == tree2
--- False
+
 -- >>> tree1 == Empty
--- False
 
 {-
 or as unit tests.
@@ -558,8 +576,15 @@ as `Ord`.
 data MyThree = One | Two | Three deriving (Eq, Ord)
 
 {-
->
+When you derive `Ord`, Haskell will order the constructors in the order that
+they appear in your source file. So, in this case, `One < Two < Three`.
+-}
 
+-- >>> One <= Two
+
+-- >>> Three <= Two
+
+{-
 Alternatively, if you're writing your own `Ord` instance, you only need to
 provide `compare` or `(<=)`; there are default definitions of the rest.
 (Don't forget to make an instance of the `Eq` class first.)
@@ -571,15 +596,21 @@ example, `Data.List` has a function which sorts lists:
 
 As you'd expect, we need to know an ordering on `a`s in order to sort
 lists of them! But if this ordering exists, `sort` can use it.
--}
 
--- >>> x
-{-
->
 -}
 
 sorted :: [MyThree]
 sorted = List.sort [Two, One, Three]
+
+{-
+If there is no ordering on `a`'s you'll get a type error from
+the compiler.
+-}
+
+-- >>> List.sort [\x -> 1, \x -> 2]
+-- No instance for (Show (p0 -> Integer))
+--   arising from a use of ‘evalPrint’
+--   (maybe you haven't applied a function to enough arguments?)
 
 {-
 Overloading and Syntax
@@ -833,39 +864,34 @@ The answer is that types themselves have *types*. To keep things straight, we
  refer to the types of types as "kinds".
 
 For example, the kind of normal types, like `Int` and `Bool` is `Type` (This
-kind can also be written as `*`, but it is still pronounced "type".)  The
-kind of parameterized types, like `Tree` and `Two` is `Type -> Type`. In
+kind is also written as `*`, but it is still pronounced "type".)  The
+kind of parameterized types, like `Tree` and `Two` is `* -> *` or `Type -> Type`. In
 other words, we can think of `Tree` like a function that needs a normal type
 argument (like `Int`) to produce a normal type (i.e. `Tree Int`).  We also
 use the words *type constructor* for `Tree` and `Two`, because they are not
 normal types, but construct them.
 
 If we are ever confused, we can ask GHC to tell us the kinds of types.
+-}
 
-        *Classes> :kind Tree
-        :kind Tree
-        Tree :: Type -> Type
-        *Classes> :kind Int
-        :kind Int
-        Int :: Type
-        *Classes> :kind Bool
-        :kind Bool
-        Bool :: Type
-        *Classes> :kind Tree
-        :kind Tree
-        Tree :: Type -> Type
-        *Classes> :kind Two
-        :kind Two
-        Two :: Type -> Type
-        *Classes> :kind Two Int
-        :kind Two Int
-        Two Int :: Type
-        *Classes>
+-- >>> :k Tree
 
+-- >>> :k Int
+
+-- >>> :k Bool
+
+-- >>> :k Tree Int
+
+-- >>> :k Two
+
+-- >>> :k Two Int
+
+{-
 For lists, the type constructor is written `[]` when it is by itself. If it is
  applied to a normal type, we write it as `[Int]`. We can also write this
  application in prefix notation, i.e. as `[] Int` (which means the same thing
- as `[Int]`.
+ as `[Int]`). The `[Int]` notation is special syntax for the application of
+ the list constructor; this behavior is not available for user-defined types.
 
 Knowing the kinds of types helps us to figure out what type class instances
  make sense. The valid instances of the `Functor` and `Monad` type classes all
@@ -881,7 +907,11 @@ standard library includes the following definition:
 < data Either a b = Left a | Right b
 
 What does GHC say is the kind of `Either`?
+-}
 
+-- >>> :k Either
+
+{-
 Monad
 =====
 
