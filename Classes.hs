@@ -1,14 +1,13 @@
 {-
 ---
 fulltitle: Type Classes
-date: September 25, 2023
 ---
 -}
 
 module Classes where
 
 import Data.Char (Char)
-import qualified Data.List as List
+import Data.List qualified as List
 import Test.HUnit (Test (TestList), runTestTT, (~:), (~?=))
 import Text.Read (Read)
 import Prelude hiding (lookup)
@@ -17,7 +16,7 @@ import Prelude hiding (lookup)
 Our first qualified type
 ========================
 
-**Question**: What is the type of (+)?
+\**Question**: What is the type of (+)?
 
 We've most often used `(+)` to add `Int`s, as in:
 -}
@@ -183,7 +182,7 @@ by using 'deriving' like we saw in [`Datatypes`](Datatypes.html)!)
 
 -}
 
-instance Eq a => Eq (Tree a) where
+instance (Eq a) => Eq (Tree a) where
   (==) :: Tree a -> Tree a -> Bool
   t1 == t2 = undefined
 
@@ -232,7 +231,7 @@ to use such a function.  For example the standard library function
 keys with their associated values.  Let's peek at its implementation:
 -}
 
-lookup :: Eq a => a -> [(a, b)] -> Maybe b
+lookup :: (Eq a) => a -> [(a, b)] -> Maybe b
 lookup _ [] = Nothing
 lookup a ((a', b) : ps) =
   if a == a'
@@ -251,7 +250,7 @@ What about a function that uses `lookup`, what is its type? Note how the
 equality constraint propagates to the type of this function.
 -}
 
-lookupDefault :: Eq a => a -> [(a, p)] -> p -> p
+lookupDefault :: (Eq a) => a -> [(a, p)] -> p -> p
 lookupDefault x xs def = case lookup x xs of
   Just y -> y
   Nothing -> def
@@ -261,7 +260,7 @@ Other overloaded operations?
 ============================
 
 Quickly, without looking at the rest of the lecture notes, brainstorm as many
-*overloaded* operations as you can. What overloaded functions have you seen
+\*overloaded* operations as you can. What overloaded functions have you seen
 in other languages? What about from your mathematics classes?
 
 FILL IN EXAMPLES HERE
@@ -273,7 +272,7 @@ hard-to-understand code and unpredictable behavior.
 Type classes are Haskell's technology to make ad hoc polymorphism less ad
 hoc. How do they encourage more principled design?
 
-*   First, the type class itself means that the types of overloaded functions
+\*   First, the type class itself means that the types of overloaded functions
     must follow a common pattern.  For example, the type of `(+)` states that any
     instance must take two arguments of the *same* type.
 
@@ -282,7 +281,7 @@ hoc. How do they encourage more principled design?
     Haskell won't allow you to overload `(+)` to work with a `String` and an `Int`
     at the same time, for example.
 
-*   Second, type classes usually come with *laws*, or specific properties that
+\*   Second, type classes usually come with *laws*, or specific properties that
     all instances of the type class are expected to adhere to. For example, all
     instances of `(==)` should satisfy reflexivity, symmetry and transitivity.
     Likewise, all instances of `(+)` should be commutative and associative.
@@ -415,7 +414,7 @@ the library `Text.Read` called
     readMaybe :: Read a => String -> Maybe a
 
 This (non-partial) version provides a way to recover from a misparse; so is
-*much* more useful.
+\*much* more useful.
 
 You can see the details of the `Read` type class in the standard library and
 in `Text.Read`.  As one might expect, parsing values is a little more
@@ -477,7 +476,7 @@ a way to describe functions that can be implemented for many types.
 
 There are some important differences, though:
 
-*   In Java, when you define a new class, you must specify all the
+\*   In Java, when you define a new class, you must specify all the
     interfaces it implements right away.  Haskell lets you add a new
     instance declaration at any time.
 
@@ -486,7 +485,7 @@ There are some important differences, though:
     wouldn't want to have to change the standard library just to
     write a new type class and give it an instance for `Int`!
 
-*   Type classes are better integrated in the standard library than
+\*   Type classes are better integrated in the standard library than
     Java interfaces.  In particular, every object in Java has `equals`
     and `toString` methods.  This leads to some silliness, since not
     every type of data can sensibly be checked for equality or printed
@@ -498,7 +497,7 @@ There are some important differences, though:
     `(==)` on a term that doesn't support it.  It's all tracked in the
     types!
 
-*   Haskell supports multiple inheritance and _multi-parameter type classes_.
+\*   Haskell supports multiple inheritance and _multi-parameter type classes_.
 
     In Haskell, classes may require that types be members of an
     arbitrary number of other classes.  For example, you might
@@ -1012,6 +1011,6 @@ as we'll see later, not necessarily `IO`!).
 More information
 ================
 
-* For more details, "Classes, Jim, but not as we know them," lecture from
+\* For more details, "Classes, Jim, but not as we know them," lecture from
 [OPLSS13](http://www.cs.uoregon.edu/research/summerschool/summer13/lectures/ClassesJimOPLSS.pdf).
 -}

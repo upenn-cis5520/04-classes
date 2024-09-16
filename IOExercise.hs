@@ -1,7 +1,6 @@
 {-
 ---
 fulltitle: "In class exercise: IOExercise"
-date:
 ---
 
 In-class exercise (IO Monad)

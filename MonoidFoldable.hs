@@ -1,13 +1,14 @@
 {-
 ---
 fulltitle: "In class exercise: Semigroup, Monoid and Foldable"
-date:
 ---
 -}
 
 module MonoidFoldable where
 
-import qualified Data.List as List
+-- https://www.seas.upenn.edu/~cis5520/current/lectures/stub/04-classes/MonoidFoldable.html
+
+import Data.List qualified as List
 import Test.HUnit
 import Prelude hiding (all, and, any, or)
 
@@ -22,7 +23,7 @@ Note that this section defines the following function that tailors a fold
 operation to a specific instance of the `Monoid` class.
 -}
 
-foldList :: Monoid b => [b] -> b
+foldList :: (Monoid b) => [b] -> b
 foldList = List.foldr (<>) mempty
 
 {-
@@ -138,20 +139,20 @@ For example, we can generalize the `and` operation to any Foldable data
 structure using `foldMap`.
 -}
 
-and :: Foldable t => t Bool -> Bool
+and :: (Foldable t) => t Bool -> Bool
 and = getAnd . foldMap And
 
 {-
 Your job is to define these three related operations
 -}
 
-or :: Foldable t => t Bool -> Bool
+or :: (Foldable t) => t Bool -> Bool
 or = undefined
 
-all :: Foldable t => (a -> Bool) -> t a -> Bool
+all :: (Foldable t) => (a -> Bool) -> t a -> Bool
 all f = undefined
 
-any :: Foldable t => (a -> Bool) -> t a -> Bool
+any :: (Foldable t) => (a -> Bool) -> t a -> Bool
 any f = undefined
 
 {-
